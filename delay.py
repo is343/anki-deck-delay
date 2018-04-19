@@ -48,6 +48,24 @@ def check_for_due(cards):
     return False
 
 
+def how_many_days_to_delay(cards):
+    '''
+    list (of tuples) -> int
+    goes through a list of cards from a deck and
+    finds the max number of days it is behind
+    '''
+    delay_days = 0
+    # cards[[][8]] == due
+    for card in cards:
+        # if something's due today
+        comparison = card[8] <= difference - 1
+        if card[8] <= difference - 1: # -1 to prevent delaying down to 0 cards
+            days_behind = difference - 1 - card[8]
+            if days_behind > delay_days:
+                delay_days = days_behind
+    return delay_days
+
+
 
 def not_new_cards(cards):
     '''
@@ -91,7 +109,7 @@ def update_database(cards):
                       WHERE id= ?""", (card[1], card[0]))
 
 
-def run_program(decks):
+def run_program(decks, delay_all=False):
     '''
     list -> ---
     goes through each deck from the chosen
@@ -101,14 +119,19 @@ def run_program(decks):
         deck = open_deck(deckToRun)
         cards = not_new_cards(deck)
         if check_for_due(cards):
-            cards = delay(cards)
+            if delay_all:
+                days_to_delay = how_many_days_to_delay(cards)
+                print('Delayed cards for', days_to_delay, 'days')
+                cards = delay(cards, days_to_delay)
+            else:
+                cards = delay(cards)
             update_database(cards)
             print('Cards in deck ' + str(deckToRun) + ' have been delayed.')
         else:
             print('No due cards in deck ' + str(deckToRun) + ' to delay')
         
 
-def run():
+def run(delay_all=False):
     '''
     main execution of the program to delay cards
     opens and closes the connection to the database
@@ -124,7 +147,7 @@ def run():
 
 
     # deck 1450345949539 == Korean; 1461588996278 == countries; 1462459650256 == states
-    run_program([1450345949539, 1461588996278, 1462459650256])
+    run_program([1450345949539, 1461588996278, 1462459650256], delay_all)
     conn.close()
     print('Process completed.')
 
@@ -145,16 +168,23 @@ def getting_time():
 
 
 print("Please close Anki before choosing an option.")
-option = input('Press "n" to dalay cards now, or "w" to wait. ').lower()
+print('Press 1 to dalay cards by one day')
+print('Press 2 to delay cards by all days they are behind')
+option = input('Press 3 to wait and delay cards by one day at night').lower()
 
 while True:
-    if option == 'w':
+    if option == '3':
         getting_time()
-    elif option == 'n':
+    elif option == '1':
         run()
         break
+    elif option == '2':
+        run(True)
+        break
     else:
-        option = input('Press "n" to dalay cards now, or "w" to wait. ').lower()
+        print('Press 1 to dalay cards by one day')
+        print('Press 2 to delay cards by all days they are behind')
+        option = input('Press 3 to wait and delay cards by one day at night').lower()
 
     
 
