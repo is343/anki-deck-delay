@@ -170,7 +170,7 @@ def getting_time():
 print("Please close Anki before choosing an option.")
 print('Press 1 to dalay cards by one day')
 print('Press 2 to delay cards by all days they are behind')
-option = input('Press 3 to wait and delay cards by one day at night').lower()
+option = input('Press 3 to wait and delay cards by one day at night ').lower()
 
 while True:
     if option == '3':
@@ -184,7 +184,7 @@ while True:
     else:
         print('Press 1 to dalay cards by one day')
         print('Press 2 to delay cards by all days they are behind')
-        option = input('Press 3 to wait and delay cards by one day at night').lower()
+        option = input('Press 3 to wait and delay cards by one day at night ').lower()
 
     
 
